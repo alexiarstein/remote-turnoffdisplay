@@ -1,0 +1,50 @@
+#!/bin/bash
+usuario=$(whoami)
+if [ "$usuario" != "root" ]; then
+echo "Correr este script como sudo" 
+else 
+x=$(dpkg-query -W --showformat='${Status}\n' vbetool | awk '{print $2}')
+if [ "$x" != "ok" ]; then
+echo "Paquete vbetool no instalado. Necesario para que este script corra."
+echo "Desea instalar ahora? [s/n]"
+read i
+case $i in
+S | s | Y | y)
+echo "Instalando vbetool (debian)"
+sudo apt-get --yes install vbetool
+sleep 0.3
+sudo cp display /usr/local/bin/
+echo "Listo. Por favor ejecutar display nuevamente."
+;;
+N | n)
+echo "No se puede continuar sin vbetool. Instalar manualmente e intentar de nuevo"
+echo "ejecutar sudo apt-get install vbetool"
+exit 1
+;;
+*)
+echo "Opcion incorrecta. Abortando"
+exit 1
+;;
+esac
+
+else
+
+case $1 in
+
+on | ON)
+sudo vbetool dpms on
+echo "Display Remoto Encendido"
+;;
+off | OFF)
+sudo vbetool dpms off
+echo "Display Remoto Apagado"
+;;
+*)
+echo "Opción Incorrecta: Switches: on/off"
+echo "                     Ej: display on"
+echo ""
+;;
+esac
+fi #instala vbetool si no existe
+fi #eof
+
